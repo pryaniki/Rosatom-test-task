@@ -11,7 +11,6 @@ class Events
     {
         if ($event == 'FEEDBACK_FORM') {
             global $USER;
-			Debug::dumpToFile($arFields, 'test');
 
             if (!$USER->IsAuthorized()) {
                 $mess = Loc::GetMessage('EX_51_NO_AUTHORIZED', ['#AUTHOR#' => $arFields['AUTHOR']]);
@@ -35,6 +34,5 @@ class Events
             ]);
 
         }
-        Debug::dumpToFile($arFields, 'test');
     }
 }
