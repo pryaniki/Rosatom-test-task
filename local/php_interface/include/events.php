@@ -9,5 +9,9 @@ $eventManager->addEventHandler(
     "OnBeforeEventAdd",
     [Events::class, "OnBeforeEventAddHandler"]
 );
-
-
+// ex2-94
+$eventManager->addEventHandler(
+    "main",
+    "OnBeforeProlog",
+    [Events::class, "OnBeforePrologHandler"]
+);

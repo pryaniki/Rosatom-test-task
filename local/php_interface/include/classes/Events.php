@@ -1,6 +1,10 @@
 <?php
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Engine\CurrentUser;
+use \Bitrix\Main\Application;
+
+use Bitrix\Iblock\Elements\ElementMetaTagsTable;
+
 
 Loc::loadMessages(__FILE__);
 
@@ -32,6 +36,34 @@ class Events
                 'ITEM_ID' => $event,
                 'DESCRIPTION' => Loc::GetMessage('EX_51_REPLACE') . ' - '.$arFields['AUTHOR'] ,
             ]);
+
+        }
+    }
+
+    // ex2-94
+    public static function OnBeforePrologHandler()
+    {
+
+        $context = Application::getInstance()->getContext();
+        $request = $context->getRequest();
+
+        if(!\Bitrix\Main\Loader::includeModule('iblock'))
+        {
+            return;
+        }
+
+        $currentPage = $request->getRequestedPageDirectory();
+
+        $result = ElementMetaTagsTable::getList([
+            'select' => ['NAME', 'TITLE', 'DESCRIPTION',],
+            'filter' => ['ACTIVE' => 'Y', 'NAME' => $currentPage,]
+        ]);
+
+        if($element = $result->fetchObject())
+        {
+            global $APPLICATION;
+            $APPLICATION->SetPageProperty('title', $element->getTitle()->getValue());
+            $APPLICATION->SetPageProperty('description', $element->getDescription()->getValue());
         }
     }
 }
