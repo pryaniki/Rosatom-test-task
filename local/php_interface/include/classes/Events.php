@@ -1,6 +1,6 @@
 <?php
-use Bitrix\Main\Diag\Debug;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Main\Engine\CurrentUser;
 
 Loc::loadMessages(__FILE__);
 
@@ -10,15 +10,15 @@ class Events
     public static function OnBeforeEventAddHandler(&$event, &$lid, &$arFields)
     {
         if ($event == 'FEEDBACK_FORM') {
-            global $USER;
-
-            if (!$USER->IsAuthorized()) {
+            $user = CurrentUser::get();
+            $userId = $user->getId();
+            if (!$userId) {
                 $mess = Loc::GetMessage('EX_51_NO_AUTHORIZED', ['#AUTHOR#' => $arFields['AUTHOR']]);
             } else {
                 $mess = Loc::GetMessage('EX_51_AUTHORIZED', [
-                    '#ID#' => $USER->GetID(),
-                    '#LOGIN#' => $USER->GetLogin(),
-                    '#NAME#' => $USER->GetFullName(),
+                    '#ID#' => $userId,
+                    '#LOGIN#' => $user->getLogin(),
+                    '#NAME#' => $user->getFullName(),
                     '#AUTHOR#' => $arFields['AUTHOR']
                 ]);
             }
@@ -32,7 +32,6 @@ class Events
                 'ITEM_ID' => $event,
                 'DESCRIPTION' => Loc::GetMessage('EX_51_REPLACE') . ' - '.$arFields['AUTHOR'] ,
             ]);
-
         }
     }
 }
