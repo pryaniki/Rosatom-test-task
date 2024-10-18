@@ -3,7 +3,7 @@ use Bitrix\Main\Localization\Loc;
 
 Loc::loadMessages(__FILE__);
 ?>
-
+<p><?=Loc::getMessage('SIMPLECOMP_EXAM2_TIMESTAMP').time()?></p>
 <?if($arResult['SECTIONS']):?>
 <p><b><?=Loc::getMessage('SIMPLECOMP_EXAM2_CAT_TITLE')?></b></p>
 
