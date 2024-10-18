@@ -6,6 +6,7 @@ use Bitrix\Main\Loader;
 use Bitrix\Main\Engine\CurrentUser;
 use Bitrix\Iblock\IblockTable;
 use Bitrix\Iblock\PropertyTable;
+use Bitrix\Main\Application;
 
 use Bitrix\Main\Localization\Loc;
 Loc::loadMessages(__FILE__);
@@ -43,7 +44,8 @@ class Catalog extends CBitrixComponent
     public function onPrepareComponentParams($params)
     {
         $params['PRODUCTS_IBLOCK_ID'] = !empty($params['PRODUCTS_IBLOCK_ID']) ? trim($params['PRODUCTS_IBLOCK_ID']) : '';
-        $params['CLASS_IBLOCK_ID'] = !empty($params['CLASS_IBLOCK_ID']) ? trim($params['CLASS_IBLOCK_ID']) : 0;
+        $params['CLASS_IBLOCK_ID'] = !empty($params['CLASS_IBLOCK_ID']) ? trim($params['CLASS_IBLOCK_ID']) : '';
+        $params['SERVISES_IBLOCK_ID'] = !empty($params['SERVISES_IBLOCK_ID']) ? trim($params['SERVISES_IBLOCK_ID']) : '';
         $params['PRODUCT_PROPERTY_CODE'] = !empty($params['PRODUCT_PROPERTY_CODE']) ? trim($params['PRODUCT_PROPERTY_CODE']) : '';
         $params['CACHE_GROUPS'] = $params['CACHE_GROUPS'] ?: 'N';
         $params['DETAIL_PAGE_URL_TEMPLATE'] = $params['DETAIL_PAGE_URL_TEMPLATE'] ?? '';
@@ -61,6 +63,10 @@ class Catalog extends CBitrixComponent
         }
         if (!$this->arParams['PRODUCT_PROPERTY_CODE']) {
             throw new SystemException(Loc::getMessage('SIMPLECOMP_EXAM2_EMPTY_PRODUCT_PROPERTY_CODE'));
+        }
+        // ex2-107
+        if (!$this->arParams['SERVICES_IBLOCK_ID']) {
+            throw new SystemException(Loc::getMessage('SIMPLECOMP_EXAM2_EMPTY_SERVISES_IBLOCK_ID'));
         }
     }
     protected function isExistIblock($iblockId): bool
@@ -89,6 +95,9 @@ class Catalog extends CBitrixComponent
     {
         $this->catalogIBId = intval($this->arParams['PRODUCTS_IBLOCK_ID']);
         $this->classifierIBId = intval($this->arParams['CLASS_IBLOCK_ID']);
+        // ex2-107
+        $this->servicesIBId = intval($this->arParams['SERVICES_IBLOCK_ID']);
+
         $this->classifierCode = str_starts_with($this->arParams['PRODUCT_PROPERTY_CODE'], 'PROPERTY_')
             ?$this->arParams['PRODUCT_PROPERTY_CODE']:
             'PROPERTY_'.$this->arParams['PRODUCT_PROPERTY_CODE'];
@@ -96,6 +105,11 @@ class Catalog extends CBitrixComponent
     protected function prepareData(): void
     {
         $userGroups = $this->user->getUserGroups();
+
+        // ex2-107
+        $taggedCache = Application::getInstance()->getTaggedCache();
+        $taggedCache->startTagCache('/cache_simplecomp_exam-71');
+
         if ( $this->startResultCache(false, ($this->arParams['CACHE_GROUPS']==='N'? false : $userGroups)) ) {
 
             if (!$this->isExistIblock($this->arParams['PRODUCTS_IBLOCK_ID'])) {
@@ -107,6 +121,9 @@ class Catalog extends CBitrixComponent
             if (!$this->isExistProperty($this->arParams['PRODUCTS_IBLOCK_ID'], $this->arParams['PRODUCT_PROPERTY_CODE'])) {
                 throw new SystemException(Loc::getMessage('SIMPLECOMP_EXAM2_NOT_EXIST_PROPERTY',['#CODE#' => $this->arParams['PRODUCT_PROPERTY_CODE']]));
             }
+
+            // ex2-107
+            $taggedCache->registerTag('iblock_id_' . $this->servicesIBId);
 
             $this->arResult['SECTIONS'] = [];
 
