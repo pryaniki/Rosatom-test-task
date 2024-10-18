@@ -124,7 +124,7 @@ class Catalog extends CBitrixComponent
             $this->clearResult();
 
             $this->arResult['ELEMENT_COUNT'] = count($this->arResult['SECTIONS']);
-            $this->SetResultCacheKeys(['ITEMS', 'ELEMENT_COUNT']);
+            $this->SetResultCacheKeys(['ELEMENT_COUNT']);
 
             $this->IncludeComponentTemplate();
         }
