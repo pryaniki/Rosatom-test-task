@@ -73,7 +73,7 @@ class Events
         {
             case IB_SERVISES:
                 $taggedCache = Application::getInstance()->getTaggedCache();
-                $taggedCache->clearByTag('iblock_id_'.$arFields['IBLOCK_ID']);
+                $taggedCache->clearByTag('my_iblock_id_'.$arFields['IBLOCK_ID']);
                 break;
         }
     }
