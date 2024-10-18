@@ -27,7 +27,6 @@ class Catalog extends CBitrixComponent
             $this->checkParams();
             $this->setProperties();
             $this->prepareData();
-
         } catch (SystemException $e) {
             if ($this->user->isAdmin()) {
                 ShowError($e->getMessage());
@@ -109,64 +108,19 @@ class Catalog extends CBitrixComponent
                 throw new SystemException(Loc::getMessage('SIMPLECOMP_EXAM2_NOT_EXIST_PROPERTY',['#CODE#' => $this->arParams['PRODUCT_PROPERTY_CODE']]));
             }
 
-            // Разделы инфоблока
-            $selectSections = [
-                'ID',
-                'NAME',
-            ];
-            $filterSections = [
-                'IBLOCK_ID' => $this->classifierIBId,
-                'ACTIVE' => 'Y',
-                'CHECK_PERMISSIONS' =>  $this->arParams['CACHE_GROUPS']
-            ];
-
             $this->arResult['SECTIONS'] = [];
-            $sectionIds = [];
-            $rsSections = \CIBlockElement::GetList([], $filterSections, false, false, $selectSections);
-            while($arSection = $rsSections->GetNext())
-            {
-                $this->arResult['SECTIONS'][$arSection['ID']] = [
-                    'NAME' => $arSection['NAME'],
-                    'PRODUCTS' => [],
-                ];
-                $sectionIds[] = $arSection['ID'];
-            }
 
-            // Нет разделов
-            if (!$sectionIds) {
+            $classifiers = $this->getClassifiers();
+            $this->fillClassifier($classifiers);
+            $classifierIds = array_keys($this->arResult['SECTIONS']);
+
+            if (!$classifierIds) {
                 $this->AbortResultCache();
                 throw new SystemException(Loc::getMessage('SIMPLECOMP_EXAM2_NOT_ELEMENTS_CLASS_IBLOCK'));
             }
 
-            $selectElements = [
-                'ID',
-                'NAME',
-                'PROPERTY_PRICE',
-                'PROPERTY_MATERIAL',
-                'PROPERTY_ARTNUMBER',
-                $this->classifierCode,
-                'DETAIL_PAGE_URL',
-            ];
-            $filterElementss = [
-                'IBLOCK_ID' => $this->catalogIBId,
-                'CHECK_PERMISSIONS' => $this->arParams['CACHE_GROUPS'],
-                $this->classifierCode => $sectionIds,
-                'ACTIVE' => 'Y'
-            ];
-
-            $elements = \CIBlockElement::GetList([], $filterElementss, false, false, $selectElements);
-            while($element = $elements->GetNext(true, false))
-            {
-                $sectionId = $element[$this->classifierCode.'_VALUE'];
-                $this->arResult['SECTIONS'][$sectionId]['PRODUCTS'][] = [
-                    'NAME' => $element['NAME'],
-                    'PRICE' => $element['PROPERTY_PRICE_VALUE'],
-                    'MATERIAL' => $element['PROPERTY_MATERIAL_VALUE'],
-                    'ARTNUMBER' => $element['PROPERTY_ARTNUMBER_VALUE'],
-                    'DETAIL_PAGE_URL' => $element['DETAIL_PAGE_URL'],
-                ];
-            }
-
+            $products = $this->getProducts($classifierIds);
+            $this->fillProducts($products);
             $this->clearResult();
 
             $this->arResult['ELEMENT_COUNT'] = count($this->arResult['SECTIONS']);
@@ -178,6 +132,63 @@ class Catalog extends CBitrixComponent
         global $APPLICATION;
         $APPLICATION->SetTitle(Loc::getMessage('SC_71_TITLE').$this->arResult['ELEMENT_COUNT']);
 
+    }
+    private function getProducts($classifierIds): CIBlockResult
+    {
+        $selectElements = [
+            'ID',
+            'NAME',
+            'PROPERTY_PRICE',
+            'PROPERTY_MATERIAL',
+            'PROPERTY_ARTNUMBER',
+            $this->classifierCode,
+            'DETAIL_PAGE_URL',
+        ];
+        $filterElementss = [
+            'IBLOCK_ID' => $this->catalogIBId,
+            'CHECK_PERMISSIONS' => $this->arParams['CACHE_GROUPS'],
+            $this->classifierCode => $classifierIds,
+            'ACTIVE' => 'Y'
+        ];
+        return \CIBlockElement::GetList([], $filterElementss, false, false, $selectElements);
+    }
+    private function fillProducts($products): void
+    {
+        while($product = $products->GetNext(true, false))
+        {
+            $sectionId = $product[$this->classifierCode.'_VALUE'];
+            $this->arResult['SECTIONS'][$sectionId]['PRODUCTS'][] = [
+                'NAME' => $product['NAME'],
+                'PRICE' => $product['PROPERTY_PRICE_VALUE'],
+                'MATERIAL' => $product['PROPERTY_MATERIAL_VALUE'],
+                'ARTNUMBER' => $product['PROPERTY_ARTNUMBER_VALUE'],
+                'DETAIL_PAGE_URL' => $product['DETAIL_PAGE_URL'],
+            ];
+        }
+    }
+    private function getClassifiers(): CIBlockResult
+    {
+        $selectSections = [
+            'ID',
+            'NAME',
+        ];
+        $filterSections = [
+            'IBLOCK_ID' => $this->classifierIBId,
+            'ACTIVE' => 'Y',
+            'CHECK_PERMISSIONS' =>  $this->arParams['CACHE_GROUPS']
+        ];
+
+        return \CIBlockElement::GetList([], $filterSections, false, false, $selectSections)?:[];
+    }
+    private function fillClassifier($classifiers): void
+    {
+        while($classifier = $classifiers->GetNext())
+        {
+            $this->arResult['SECTIONS'][$classifier['ID']] = [
+                'NAME' => $classifier['NAME'],
+                'PRODUCTS' => [],
+            ];
+        }
     }
     protected function clearResult()
     {
