@@ -123,7 +123,7 @@ class Catalog extends CBitrixComponent
             }
 
             // ex2-107
-            $taggedCache->registerTag('iblock_id_' . $this->servicesIBId);
+            $taggedCache->registerTag('my_iblock_id_' . $this->servicesIBId);
 
             $this->arResult['SECTIONS'] = [];
 
