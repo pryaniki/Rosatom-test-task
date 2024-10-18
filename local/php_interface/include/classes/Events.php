@@ -66,4 +66,15 @@ class Events
             $APPLICATION->SetPageProperty('description', $element->getDescription()->getValue());
         }
     }
+    // ex2-107
+    public static function clearIblockCache($arFields)
+    {
+        switch ($arFields['IBLOCK_ID'])
+        {
+            case IB_SERVISES:
+                $taggedCache = Application::getInstance()->getTaggedCache();
+                $taggedCache->clearByTag('iblock_id_'.$arFields['IBLOCK_ID']);
+                break;
+        }
+    }
 }

@@ -13,6 +13,11 @@ $arComponentParameters = array(
             'NAME' => Loc::getMessage('SE2_CLASS_IBLOCK_ID'),
             'TYPE' => 'STRING',
         ),
+        // ex2-107
+        'SERVICES_IBLOCK_ID' => array(
+            'NAME' => Loc::getMessage('SE2_SERVISES_IBLOCK_ID'),
+            'TYPE' => 'STRING',
+        ),
 		'DETAIL_PAGE_URL_TEMPLATE' => array(
 			'NAME' => Loc::getMessage('SE2_DETAIL_PAGE_URL_TEMPLATE'),
 			'TYPE' => 'STRING',
