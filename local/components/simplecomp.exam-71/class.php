@@ -126,8 +126,8 @@ class Catalog extends CBitrixComponent
             $this->arResult['ELEMENT_COUNT'] = count($this->arResult['SECTIONS']);
             $this->SetResultCacheKeys(['ITEMS', 'ELEMENT_COUNT']);
 
+            $this->IncludeComponentTemplate();
         }
-        $this->IncludeComponentTemplate();
 
         global $APPLICATION;
         $APPLICATION->SetTitle(Loc::getMessage('SC_71_TITLE').$this->arResult['ELEMENT_COUNT']);
