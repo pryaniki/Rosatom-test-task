@@ -118,6 +118,9 @@ class Catalog extends CBitrixComponent
             if (!$this->isExistIblock($this->arParams['CLASS_IBLOCK_ID'])) {
                 throw new SystemException(Loc::getMessage('SIMPLECOMP_EXAM2_NOT_EXIST_IBLOCK', ['#ID#' => $this->arParams['CLASS_IBLOCK_ID']]));
             }
+            if (!$this->isExistIblock($this->arParams['SERVICES_IBLOCK_ID'])) {
+                throw new SystemException(Loc::getMessage('SIMPLECOMP_EXAM2_NOT_EXIST_IBLOCK', ['#ID#' => $this->arParams['SERVICES_IBLOCK_ID']]));
+            }
             if (!$this->isExistProperty($this->arParams['PRODUCTS_IBLOCK_ID'], $this->arParams['PRODUCT_PROPERTY_CODE'])) {
                 throw new SystemException(Loc::getMessage('SIMPLECOMP_EXAM2_NOT_EXIST_PROPERTY',['#CODE#' => $this->arParams['PRODUCT_PROPERTY_CODE']]));
             }
