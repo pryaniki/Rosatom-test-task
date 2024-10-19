@@ -12,5 +12,6 @@ $APPLICATION->SetTitle("Простой компонент");
 		"DETAIL_PAGE_URL_TEMPLATE" => "",
 		"PRODUCTS_IBLOCK_ID" => "2",
 		"PRODUCT_PROPERTY_CODE" => "FIRM",
+		"SERVICES_IBLOCK_ID" => "3",
 	)
 );?><?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
